@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopSphere Support</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #eaeded;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            color: #111;
+        }
+
+        .chat-app {
+            width: min(900px, 100%);
+            height: min(760px, 88vh);
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: #131921;
+            color: white;
+            padding: 18px 22px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #ff9900;
+            color: #131921;
+            display: grid;
+            place-items: center;
+            font-weight: bold;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            margin: 0 0 5px;
+        }
+
+        .header p {
+            margin: 0;
+            font-size: 13px;
+            color: #d5d9d9;
+        }
+
+        .status-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #00a650;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            background: #f7f8f8;
+        }
+
+        .message {
+            max-width: 76%;
+            padding: 13px 16px;
+            border-radius: 16px;
+            line-height: 1.5;
+            font-size: 15px;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .assistant {
+            align-self: flex-start;
+            background: white;
+            border: 1px solid #ddd;
+            border-bottom-left-radius: 4px;
+        }
+
+        .user {
+            align-self: flex-end;
+            background: #232f3e;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .quick-questions {
+            padding: 12px 18px;
+            background: white;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+        }
+
+        .quick-questions button {
+            white-space: nowrap;
+            border: 1px solid #ff9900;
+            color: #7a4a00;
+            background: #fff8e8;
+            border-radius: 999px;
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        .quick-questions button:hover {
+            background: #ffedc2;
+        }
+
+        .composer {
+            background: white;
+            border-top: 1px solid #ddd;
+            padding: 16px 18px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .composer input {
+            flex: 1;
+            min-width: 0;
+            border: 1px solid #aab7b8;
+            border-radius: 10px;
+            padding: 13px 14px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .composer input:focus {
+            border-color: #ff9900;
+            box-shadow: 0 0 0 2px rgba(255, 153, 0, 0.18);
+        }
+
+        .composer button {
+            border: 0;
+            border-radius: 10px;
+            background: #ff9900;
+            color: #111;
+            font-weight: bold;
+            padding: 0 22px;
+            cursor: pointer;
+        }
+
+        .composer button:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        .typing {
+            color: #666;
+            font-style: italic;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 0;
+            }
+
+            .chat-app {
+                width: 100%;
+                height: 100vh;
+                height: 100dvh;
+                border-radius: 0;
+            }
+
+            .messages {
+                padding: 16px;
+            }
+
+            .message {
+                max-width: 88%;
+            }
+
+            .composer button {
+                padding: 0 16px;
+            }
+
+            .header {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="chat-app">
+
+    <div class="header">
+        <div class="logo">S</div>
+        <div>
+            <h1>ShopSphere Customer Support</h1>
+            <p>
+                <span class="status-dot"></span>
+                AI assistant grounded in company policies
+            </p>
+        </div>
+    </div>
+
+    <div class="messages" id="messages" aria-live="polite">
+        <div class="message assistant">
+            Hi! I can help with returns, exchanges, shipping, payments,
+            refunds and orders. What would you like to know?
+        </div>
+    </div>
+
+    <div class="quick-questions">
+        <button type="button"
+                onclick="askQuick('Can I return a product after 20 days?')">
+            Return after 20 days?
+        </button>
+
+        <button type="button"
+                onclick="askQuick('How long does a refund take?')">
+            Refund time?
+        </button>
+
+        <button type="button"
+                onclick="askQuick('Can I exchange a different size?')">
+            Exchange size?
+        </button>
+
+        <button type="button"
+                onclick="askQuick('How long is standard delivery?')">
+            Delivery time?
+        </button>
+    </div>
+
+    <form class="composer" id="chatForm">
+        <input
+                id="question"
+                type="text"
+                placeholder="Ask about your order or our policies..."
+                autocomplete="off"
+                required
+        >
+        <button id="sendButton" type="submit">Send</button>
+    </form>
+
+</div>
+
+
+<script>
+    const API_URL = "http://localhost:8080/api/v1/query";
+
+    const form = document.getElementById("chatForm");
+    const questionInput = document.getElementById("question");
+    const messages = document.getElementById("messages");
+    const sendButton = document.getElementById("sendButton");
+
+    form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        await sendQuestion(questionInput.value.trim());
+    });
+
+    async function askQuick(question) {
+        if (sendButton.disabled) return;
+
+        questionInput.value = question;
+        await sendQuestion(question);
+    }
+
+    async function sendQuestion(question) {
+        if (!question || sendButton.disabled) return;
+
+        addMessage(question, "user");
+        questionInput.value = "";
+        sendButton.disabled = true;
+
+        const typing = addMessage(
+            "Searching company policies...",
+            "assistant typing"
+        );
+
+        try {
+            const url = API_URL + "?question=" +
+                encodeURIComponent(question);
+
+            const response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    Accept: "text/plain"
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(
+                    "HTTP " + response.status + ": " +
+                    await response.text()
+                );
+            }
+
+            const answer = await response.text();
+            typing.remove();
+
+            addMessage(
+                answer.trim() ||
+                "No answer received from the assistant.",
+                "assistant"
+            );
+        } catch (error) {
+            typing.remove();
+            console.error("Chat request failed:", error);
+
+            let message;
+
+            if (error instanceof TypeError) {
+                message =
+                    "Cannot connect to the backend. Check that " +
+                    "Spring Boot is running and CORS is configured.";
+            } else {
+                message = "Request failed: " + error.message;
+            }
+
+            addMessage(message, "assistant");
+        } finally {
+            sendButton.disabled = false;
+            questionInput.focus();
+        }
+    }
+
+    function addMessage(text, className) {
+        const div = document.createElement("div");
+
+        div.className = "message " + className;
+        div.textContent = text;
+
+        messages.appendChild(div);
+        messages.scrollTop = messages.scrollHeight;
+
+        return div;
+    }
+</script>
+
+</body>
+</html>
