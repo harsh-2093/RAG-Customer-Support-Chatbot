@@ -65,8 +65,13 @@ public class chatBotService {
                     SearchRequest.builder()
                             .query(question)
                             .topK(4)
+                            .similarityThreshold(.25)
                             .build()
         );
+        if(relevantChunks.isEmpty())
+        {
+            return "tripathi bhai bandi nhi pan payegi aaise";
+        }
 
         StringBuilder context=new StringBuilder();
         for(Document document:relevantChunks)
