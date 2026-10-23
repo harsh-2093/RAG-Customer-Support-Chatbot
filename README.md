@@ -30,7 +30,7 @@ HTML/CSS/JavaScript
 - "How long does a refund take?"
 
 ## Results
-Tested on 50 questions: 87% answered correctly. Average response time 5.4s.
+Tested on 44/50 questions: 87% answered correctly. Average response time 5.4s.
 
 ## Limitations & next steps
 - Conversation history is in-memory (single user)
