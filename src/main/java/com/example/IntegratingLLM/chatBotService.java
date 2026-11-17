@@ -44,6 +44,7 @@ public class chatBotService {
 
         TokenTextSplitter splitter=TokenTextSplitter.builder()
                 .withChunkSize(400)
+                .withChunkOverlap(50)
                 .withMinChunkSizeChars(150)
                 .withKeepSeparator(true)
                 .build();
