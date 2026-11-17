@@ -43,7 +43,9 @@ public class chatBotService {
         List<Document>allChnks=new ArrayList<>();
 
         TokenTextSplitter splitter=TokenTextSplitter.builder()
-                .withChunkSize(300)
+                .withChunkSize(400)
+                .withMinChunkSizeChars(150)
+                .withKeepSeparator(true)
                 .build();
 
         for(Resource resource :policyFiles){
