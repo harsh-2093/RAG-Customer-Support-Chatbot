@@ -16,8 +16,11 @@ import org.springframework.core.io.Resource;
 import org.springframework.ai.document.Document;
 import org.springframework.stereotype.Service;
 
+import javax.print.Doc;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class chatBotService {
@@ -52,7 +55,32 @@ public class chatBotService {
         for(Resource resource :policyFiles){
             PagePdfDocumentReader reader= new PagePdfDocumentReader(resource);
             List<Document> pages=reader.read();
-            List<Document> chunks=splitter.apply(pages);
+            String filename=resource.getFilename();
+            String category=switch(filename){
+                case "exchange-policy.pdf" -> "exchange";
+                case "orders-account-help.pdf" -> "orders";
+                case "payment-refund-policy.pdf" -> "payment_refund";
+                case "return-policy.pdf" -> "return";
+                case "shipping-delivery.pdf" -> "shipping";
+                default -> "general";
+            };
+
+            List<Document>pagesWithMetaData=new ArrayList<>();
+            for(Document page:pages)
+            {
+                Map<String,Object> metadata=
+                        new HashMap<>(page.getMetadata());
+                metadata.put("category",category);
+                metadata.put("source",filename);
+
+                Document newPage=new Document(
+                        page.getText(),
+                        metadata
+                );
+                pagesWithMetaData.add(newPage);
+            }
+
+            List<Document> chunks=splitter.apply(pagesWithMetaData);
             allChnks.addAll(chunks);
         }
         vectorStore.add(allChnks);
